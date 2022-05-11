@@ -149,6 +149,9 @@ def search():
                 'link': (link_url / item['id']).url,
                 'description': item['summary_ssi'],
                 'item_format': item['avalon_resource_type_ssim'][0],
+                'extra': {
+                    'collection': item['collection_ssim'][0],
+                },
             })
 
     return response
