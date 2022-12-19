@@ -1,13 +1,12 @@
 import json
 import logging
 import os
-import sys
 import json
 import urllib.parse
 import requests
 
 import furl
-from flask import Flask, Response, request
+from flask import Flask, request
 from dotenv import load_dotenv
 from waitress import serve
 from paste.translogger import TransLogger
@@ -29,7 +28,7 @@ link_url = furl.furl(env['AVALON_URL']) / 'media_objects'
 no_results_link = env['AVALON_NO_RESULTS_LINK']
 module_link = env['AVALON_MODULE_LINK']
 
-debug = os.environ.get('FLASK_ENV') == 'development'
+debug = os.environ.get('FLASK_DEBUG')
 
 logging.root.addHandler(logging.StreamHandler())
 
@@ -39,12 +38,6 @@ logger = logging.getLogger('avalon-searcher')
 if debug:
     loggerWaitress.setLevel(logging.DEBUG)
     logger.setLevel(logging.DEBUG)
-
-    # from http.client import HTTPConnection
-    # HTTPConnection.debuglevel = 1
-    # requests_log = logging.getLogger("requests.packages.urllib3")
-    # requests_log.setLevel(logging.DEBUG)
-    # requests_log.propagate = True
 else:
     loggerWaitress.setLevel(logging.INFO)
     logger.setLevel(logging.INFO)
@@ -85,11 +78,11 @@ def search():
 
     per_page = 3
     if 'per_page' in args and args['per_page'] != "":
-    	per_page = args['per_page']
+        per_page = args['per_page']
 
     page = 1
     if 'page' in args and args['page'] != "" and args['page'] != "%":
-    	page = int(args['page']) + 1
+        page = int(args['page']) + 1
 
     # Execute the Avalon search
     params = {
