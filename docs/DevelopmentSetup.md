@@ -23,23 +23,23 @@ $ pyenv install 3.10.8
 
 ## Installation for development
 
-1) Clone the "faq-searcher" Git repository:
+1) Clone the "avalon-searcher" Git repository:
 
 ```bash
-$ git clone https://github.com/umd-lib/faq-searcher.git
+$ git clone https://github.com/umd-lib/avalon-searcher.git
 ```
 
-2) Switch to the "faq-searcher" directory:
+2) Switch to the "avalon-searcher" directory:
 
 ```bash
-$ cd faq-searcher
+$ cd avalon-searcher
 ```
 
 3) Set up the virtual environment:
 
 ```bash
-$ pyenv virtualenv 3.10.8 faq-searcher
-$ pyenv shell faq-searcher
+$ pyenv virtualenv 3.10.8 avalon-searcher
+$ pyenv shell avalon-searcher
 ```
 
 4) Run "pip install" to download dependencies:
