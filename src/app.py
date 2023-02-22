@@ -24,6 +24,7 @@ for key in ('AVALON_URL', 'AVALON_NO_RESULTS_LINK', 'AVALON_MODULE_LINK'):
         raise RuntimeError(f'Must provide environment variable: {key}')
 
 search_url = furl.furl(env['AVALON_URL']) / 'catalog.json'
+raw_url = env['AVALON_URL']
 link_url = furl.furl(env['AVALON_URL']) / 'media_objects'
 no_results_link = env['AVALON_NO_RESULTS_LINK']
 module_link = env['AVALON_MODULE_LINK']
@@ -121,6 +122,8 @@ def search():
 
     data = json.loads(response.text)
 
+    logger.debug(data)
+
     # Gather the search results into our response
     results = []
     response = {
@@ -128,26 +131,58 @@ def search():
         'query': query,
         "per_page": str(per_page),
         "page": str(page),
-        "total": int(data['response']['pages']['total_count']),
+        "total": int(data['meta']['pages']['total_count']),
         "module_link": module_link.replace('{query}',
                                            urllib.parse.quote_plus(query)),
         "no_results_link": no_results_link,
         "results": results
     }
 
-    if 'docs' in data['response']:
-        for item in data['response']['docs']:
-            results.append({
-                'title': item['title_tesi'],
-                'link': (link_url / item['id']).url,
-                'description': item['summary_ssi'],
-                'item_format': item['avalon_resource_type_ssim'][0],
-                'extra': {
-                    'collection': item['collection_ssim'][0],
-                },
-            })
+    if 'data' in data:
+        for item in data['data']:
+            if 'attributes' in item:
+                item_id = item['id']
+                collection_name = None
+                item_format = None
+                item_metadata = get_item_metadata(item_id)
+                if item_metadata is not None:
+                    if 'collection_ssim' in item_metadata:
+                        collection_name = item_metadata['collection_ssim'][0]
+                    if 'avalon_resource_type_ssim' in item_metadata:
+                        item_format = item_metadata['avalon_resource_type_ssim'][0]
+                results.append({
+                    'title': item['attributes']['title_tesi']['attributes']['value'],
+                    'link': (link_url / item_id).url,
+                    'description': item['attributes']['summary_ssi']['attributes']['value'],
+                    'item_format': item_format,
+                    'extra': {
+                        'collection': collection_name,
+                    },
+                })
 
     return response
+
+
+def get_item_metadata(item_id):
+    if item_id is None:
+        return None
+    item_query_url = furl.furl(raw_url) / 'catalog' / item_id / '/raw.json'
+    logger.debug(item_query_url.url)
+
+    try:
+        response = requests.get(item_query_url.url)
+    except Exception as err:
+        logger.error(f'Item query error submitting search url={search_url.url}, params={params}\n{err}')
+
+        return {
+            'endpoint': endpoint,
+            'error': {
+                'msg': f'Error submitting search',
+            },
+        }, 500
+
+    data = json.loads(response.text)
+    return data
 
 
 if __name__ == '__main__':
