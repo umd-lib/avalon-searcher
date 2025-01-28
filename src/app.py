@@ -141,6 +141,9 @@ def search():
     if 'data' in data:
         for item in data['data']:
             if 'attributes' in item:
+                summary = None
+                if 'summary_ssi' in item['attributes']:
+                    summary = item['attributes']['summary_ssi']['attributes']['value']
                 item_id = item['id']
                 collection_name = None
                 item_format = None
@@ -153,7 +156,7 @@ def search():
                 results.append({
                     'title': item['attributes']['title_tesi']['attributes']['value'],
                     'link': (link_url / item_id).url,
-                    'description': item['attributes']['summary_ssi']['attributes']['value'],
+                    'description': summary,
                     'item_format': item_format,
                     'extra': {
                         'collection': collection_name,
