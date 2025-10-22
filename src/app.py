@@ -53,17 +53,17 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 
-@app.route('/')
+@app.route('/api/services/avalon')
 def root():
     return {'status': 'ok'}
 
 
-@app.route('/ping')
+@app.route('/api/services/avalon/ping')
 def ping():
     return {'status': 'ok'}
 
 
-@app.route('/search')
+@app.route('/api/services/avalon/search')
 def search():
 
     # Get the request parameters

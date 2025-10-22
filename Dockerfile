@@ -1,6 +1,4 @@
-FROM python:3
-
-LABEL MAINTAINER SSDR "lib-ssdr@umd.edu"
+FROM python:3.13
 
 EXPOSE 5000
 
