@@ -4,6 +4,7 @@ import os
 import json
 import urllib.parse
 import requests
+import html
 
 import furl
 from flask import Flask, request
@@ -141,6 +142,9 @@ def search():
     if 'data' in data:
         for item in data['data']:
             if 'attributes' in item:
+                if 'title_tesi' not in item['attributes'] or 'attributes' not in item['attributes']['title_tesi'] or 'value' not in item['attributes']['title_tesi']['attributes']:
+                    continue
+                title = item['attributes']['title_tesi']['attributes']['value']
                 summary = None
                 if 'summary_ssi' in item['attributes']:
                     summary = item['attributes']['summary_ssi']['attributes']['value']
@@ -154,7 +158,7 @@ def search():
                     if 'avalon_resource_type_ssim' in item_metadata:
                         item_format = item_metadata['avalon_resource_type_ssim'][0]
                 results.append({
-                    'title': item['attributes']['title_tesi']['attributes']['value'],
+                    'title': html.unescape(title),
                     'link': (link_url / item_id).url,
                     'description': summary,
                     'item_format': item_format,
